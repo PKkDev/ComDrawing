@@ -1,0 +1,160 @@
+<div class="page_container">
+
+  <div class=" settings_card" *ngIf="!isConfigured">
+
+    <div class="row">
+      <button mat-raised-button [color]="isSelectedHost? 'primary':''"
+        (click)="isSelectedHost = true; isSelectedClient = false;">Хост</button>
+
+      <button mat-raised-button [color]="isSelectedClient? 'primary':''"
+        (click)="isSelectedHost = false; isSelectedClient = true;">Клиент</button>
+    </div>
+
+
+    <mat-form-field class="my_form_field" appearance="outline">
+      <mat-label>Хост</mat-label>
+      <input matInput type="text" [(ngModel)]="host" required autocomplete="off">
+      <button *ngIf="host" matSuffix mat-icon-button aria-label="Clear" (click)="host=''">
+        <mat-icon>close</mat-icon>
+      </button>
+    </mat-form-field>
+
+    <mat-form-field class="my_form_field" appearance="outline">
+      <mat-label>Имя пользователя</mat-label>
+      <input matInput type="text" [(ngModel)]="userName" required autocomplete="off">
+      <button *ngIf="userName" matSuffix mat-icon-button aria-label="Clear" (click)="userName=''">
+        <mat-icon>close</mat-icon>
+      </button>
+    </mat-form-field>
+
+    <mat-form-field class="my_form_field" appearance="outline" *ngIf="isSelectedHost">
+      <mat-label>Группа</mat-label>
+      <input matInput type="text" [(ngModel)]="groupName" required autocomplete="off">
+      <button *ngIf="groupName" matSuffix mat-icon-button aria-label="Clear" (click)="groupName=''">
+        <mat-icon>close</mat-icon>
+      </button>
+    </mat-form-field>
+
+    <div class="row" *ngIf="isSelectedClient">
+
+      <mat-form-field class="my_form_field" appearance="outline">
+        <mat-label>Группа</mat-label>
+        <mat-select [(ngModel)]="groupName">
+          <mat-option *ngFor="let group of totalGroups" [value]="group">
+            {{group}}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <button mat-raised-button (click)="onRefreshGroups()">Обновить</button>
+
+    </div>
+
+
+    <button mat-raised-button color="primary" [disabled]=" !userName || !host || !groupName"
+      (click)="onConnect()">Подключиться</button>
+
+  </div>
+
+  <div class="draw_card" *ngIf="isConfigured">
+
+    <div class="messages_col col">
+
+      <div class="title">Чат</div>
+
+      <div class="list" #messagesList>
+
+        <ng-container *ngFor="let message of messages" [ngTemplateOutlet]="message.template"
+          [ngTemplateOutletContext]="{ $implicit: message}">
+        </ng-container>
+
+      </div>
+
+      <div class="footer">
+
+        <input matInput type="text" [(ngModel)]="newMessage">
+
+        <button mat-raised-button (click)="onSendMessage()">Отправить</button>
+
+      </div>
+
+    </div>
+
+    <div class="draw_col col">
+
+      <canvas width="600" height="500" #canvas (mousedown)="onMouseDown($event)" (mouseup)="onMouseUp($event)"
+        (mousemove)="onMouseMove($event)">
+      </canvas>
+
+    </div>
+
+    <div class="tool_col col">
+
+      <div class="title">Инструменты</div>
+
+      <label class="connect_state" [style.color]="connection?.state == 'Connected' ? 'green': 'red'">
+        {{connection?.state}}
+      </label>
+
+      <button mat-raised-button (click)="onCopyLinc()">Копировать ссылку</button>
+
+      <div class="tool_labels_row">
+        <label class="width_tool_label">Цвет линии</label>
+      </div>
+
+      <div class="color_line ">
+        <input class="color_picker" type="color" [(ngModel)]="color">
+        <svg class="eraser_icon" role="img" focusable="false" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 14 14" (click)="onSelectEraser()">
+          <path fill="#26a6d1"
+            d="M8.86813404 1.19820285l3.92120103 3.92120144c.26422773.26422763.26422773.6931591 0 .95738673l-6.7005097 6.70008258c-.26422762.26461194-.6931591.26461194-.95738672 0L1.21066483 8.85567196c-.2642276-.26422763-.2642276-.6927742 0-.95700183L7.91079 1.19820285c.26461254-.26427044.6931164-.26427044.95734403 0z" />
+          <path fill="#e2574c"
+            d="M4.61949218 4.48984279L1.21066483 7.89867013c-.2642276.26422764-.2642276.6927742 0 .95700183l3.92120143 3.92120164c.26422764.26461194.6931592.26461194.95738684 0l3.40882734-3.40844254-4.87858826-4.87858827z" />
+          <path
+            d="M5.4604647 12.32859099l7.3710485.03300202-.00319343.63840698-7.37104929-.03300202.00326328-.63840798z" />
+          <path fill="#cb4e44"
+            d="M2.7481293 6.36120567L1.21066482 7.89867013c-.2642276.26422764-.2642276.6927743 0 .95700193l3.92120143 3.92120154c.26422764.26461194.6931592.26461194.95738684 0l1.53750717-1.53712277L2.7481293 6.36120567z" />
+          <path fill="#eae5e4"
+            d="M1.88551883 7.22497095l4.87743345 4.87743295-.45142803.45142813-4.87743344-4.87743305.45142802-.45142803z" />
+        </svg>
+      </div>
+
+      <div class="tool_labels_row">
+        <label class="width_tool_label">Толщина линии</label>
+        <label class="width_tool_value">{{width}}</label>
+      </div>
+
+      <mat-slider class="width_tool_slider" [max]="10" [min]="1" [step]="1" [discrete]="'asdasd'"
+        [showTickMarks]="true">
+        <input matSliderThumb [(ngModel)]="width">
+      </mat-slider>
+
+    </div>
+
+  </div>
+
+</div>
+
+<ng-template #sysMesTempl let-message>
+  <div class="system_message">
+    {{message.message}}
+  </div>
+</ng-template>
+
+<ng-template #thisUserMesTempl let-message>
+  <div class="this_system_message">
+    {{message.message}}<br>
+    <label>{{message.userName}}</label>
+  </div>
+</ng-template>
+
+<ng-template #otherUserMesTempl let-message>
+  <div class="other_system_message">
+    {{message.message}}<br>
+    <label>{{message.userName}}</label>
+  </div>
+</ng-template>
+
+<!-- <div class="display_cursor">
+  <label>Test</label>
+</div> -->

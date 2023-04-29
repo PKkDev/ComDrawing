@@ -1,0 +1,27 @@
+html,
+body {
+    height: 100%;
+}
+
+body {
+    margin: 0;
+    font-family: Roboto, "Helvetica Neue", sans-serif;
+    background-color: #eee;
+}
+
+.my_form_field {
+    .mat-mdc-text-field-wrapper {
+        margin: 0 !important;
+        padding: 0 5px !important;
+        .mat-mdc-form-field-flex {
+            .mat-mdc-form-field-infix {
+                padding-top: 13px !important;
+                padding-bottom: 13px !important;
+                min-height: unset !important;
+            }
+        }
+    }
+    .mat-mdc-form-field-subscript-wrapper {
+        height: 10px !important;
+    }
+}
