@@ -1,9 +1,8 @@
-import { AfterViewInit, Component, ElementRef, OnInit, QueryList, Renderer2, TemplateRef, ViewChild, ViewChildren } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, OnInit, QueryList, Renderer2, ViewChildren } from '@angular/core';
 import { HubConnection, HubConnectionBuilder, HubConnectionState } from '@microsoft/signalr';
 import { CursorData, CursorModel, DrawData, MessageModel } from './model';
 import { HttpClient, HttpParams, HttpRequest } from '@angular/common/http';
 import { Clipboard } from '@angular/cdk/clipboard';
-import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-root',
@@ -12,7 +11,7 @@ import { ActivatedRoute } from '@angular/router';
 })
 export class AppComponent implements OnInit, AfterViewInit {
 
-  public host: string = 'https://localhost:7034/';
+  public host: string | undefined;
   public userName: string | undefined;
   public groupName: string | undefined;
 
@@ -21,18 +20,9 @@ export class AppComponent implements OnInit, AfterViewInit {
   public connection: HubConnection | undefined;
   public isConnected: boolean = false;
 
-  @ViewChild('sysMesTempl', { static: false }) sysMesTempl: TemplateRef<any> | undefined;
-  @ViewChild('thisUserMesTempl', { static: false }) thisUserMesTempl: TemplateRef<any> | undefined;
-  @ViewChild('otherUserMesTempl', { static: false }) otherUserMesTempl: TemplateRef<any> | undefined;
-
+  @ViewChildren('canvas') private canvases?: QueryList<ElementRef>;
   public canvas: ElementRef | undefined;
   public ctx: CanvasRenderingContext2D | null = null;
-
-  @ViewChildren('canvas') private canvases?: QueryList<ElementRef>;
-
-  @ViewChild('messagesList', { static: false }) messagesList: ElementRef | undefined;
-
-  public newMessage: string | undefined;
 
   public messages: MessageModel[] = [];
 
@@ -43,11 +33,10 @@ export class AppComponent implements OnInit, AfterViewInit {
     private http: HttpClient,
     private elementRef: ElementRef,
     private renderer2: Renderer2,
-    private clipboard: Clipboard,
-    private route: ActivatedRoute) {
+    private clipboard: Clipboard) {
   }
 
-  //#region settings
+  //#region Settings
 
   public isConfigured = false;
   public isSelectedHost = true;
@@ -91,14 +80,12 @@ export class AppComponent implements OnInit, AfterViewInit {
     });
 
     this.connection.on('SendMessage', (userName: string, message: string) => {
-      this.messages.push({ message: message, userName: userName, template: this.setMessageTemplate(userName) });
-      setTimeout(() => { if (this.messagesList) this.messagesList.nativeElement.scrollTop = this.messagesList.nativeElement.scrollHeight + 40; }, 500)
-
+      this.viewUserMessage(message, userName);
     });
 
     this.connection.start()
       .catch((err) => {
-        this.messages.push({ message: err, userName: "System", template: this.setMessageTemplate("System") });
+        this.viewSystemMessage(err);
         this.isConnected = false;
       })
       .then(() => {
@@ -108,12 +95,14 @@ export class AppComponent implements OnInit, AfterViewInit {
     this.isConfigured = true;
   }
 
-  //#endregion settings
+  //#endregion Settings
 
   ngOnInit() {
-
     this.host = window.document.baseURI;
+    this.checkUrlParam();
+  }
 
+  private checkUrlParam() {
     const searchParams = new URLSearchParams(window.document.URL);
 
     const group = searchParams.get("group");
@@ -132,7 +121,6 @@ export class AppComponent implements OnInit, AfterViewInit {
       this.isSelectedHost = false;
       this.isSelectedClient = true;
     }
-
   }
 
   ngAfterViewInit() {
@@ -147,12 +135,6 @@ export class AppComponent implements OnInit, AfterViewInit {
         }
       });
     }
-  }
-
-  private setMessageTemplate(userName: string): TemplateRef<any> {
-    if (userName == 'System') return this.sysMesTempl!;
-    if (userName == this.userName) return this.thisUserMesTempl!;
-    return this.otherUserMesTempl!;
   }
 
   public onSelectEraser() {
@@ -189,7 +171,7 @@ export class AppComponent implements OnInit, AfterViewInit {
         }
         this.connection
           .invoke("Drawing", this.groupName, this.userName, drawData)
-          .catch((err) => { this.messages.push({ message: err, userName: "System", template: this.setMessageTemplate("System") }); });
+          .catch((err) => { this.viewSystemMessage(err); });
       }
 
       this.startX = currX;
@@ -200,7 +182,7 @@ export class AppComponent implements OnInit, AfterViewInit {
       const cursorData: CursorData = { x: currX, y: currY, }
       this.connection
         .invoke("MoveCursor", this.groupName, this.userName, cursorData)
-        .catch((err) => { this.messages.push({ message: err, userName: "System", template: this.setMessageTemplate("System") }); });
+        .catch((err) => { this.viewSystemMessage(err); });
     }
 
   }
@@ -211,13 +193,11 @@ export class AppComponent implements OnInit, AfterViewInit {
 
   //#endregion Drawing
 
-  public onSendMessage() {
-    if (this.connection) {
+  public onSendMessage(message: string) {
+    if (this.connection)
       this.connection
-        .invoke('SendMessageToGroup', this.groupName, this.userName, this.newMessage)
-        .then(() => this.newMessage = '')
-        .catch((err) => { this.messages.push({ message: err, userName: "System", template: this.setMessageTemplate("System") }); });
-    }
+        .invoke('SendMessageToGroup', this.groupName, this.userName, message)
+        .catch((err) => { this.viewSystemMessage(err); });
   }
 
   private viewCursor(x: number, y: number, userName: string) {
@@ -265,13 +245,27 @@ export class AppComponent implements OnInit, AfterViewInit {
     }
   }
 
+  //#region View message
+  private viewSystemMessage(message: string) {
+    this.messages.push({
+      message: message,
+      userName: 'System'
+    });
+  }
+  private viewUserMessage(message: string, user: string) {
+    this.messages.push({
+      message: message,
+      userName: user
+    });
+  }
+  //#endregion View message
+
   public onCopyLinc() {
     if (this.host && this.groupName) {
       const httpParams: HttpParams = new HttpParams()
         .append('id', '5')
         .append('host', encodeURIComponent(this.host))
         .append('group', this.groupName);
-
       const req = new HttpRequest('GET', window.document.baseURI, { params: httpParams });
       this.clipboard.copy(req.urlWithParams)
     }

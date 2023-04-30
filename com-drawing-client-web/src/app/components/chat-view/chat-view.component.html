@@ -1,0 +1,32 @@
+<div class="title">Чат</div>
+
+<div class="list" #messagesList>
+  <ng-container #messageItem *ngFor="let message of messages" [ngTemplateOutlet]="setMessageTemplate(message)"
+    [ngTemplateOutletContext]="{ $implicit: message}">
+  </ng-container>
+</div>
+
+<div class="footer">
+  <input matInput type="text" [(ngModel)]="newMessage">
+  <button mat-raised-button (click)="onSendMessage()">Отправить</button>
+</div>
+
+<ng-template #sysMesTempl let-message>
+  <div class="system_message">
+    {{message.message}}
+  </div>
+</ng-template>
+
+<ng-template #thisUserMesTempl let-message>
+  <div class="this_system_message">
+    {{message.message}}<br>
+    <label>{{message.userName}}</label>
+  </div>
+</ng-template>
+
+<ng-template #otherUserMesTempl let-message>
+  <div class="other_system_message">
+    {{message.message}}<br>
+    <label>{{message.userName}}</label>
+  </div>
+</ng-template>

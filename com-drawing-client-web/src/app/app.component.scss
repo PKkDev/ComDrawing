@@ -59,55 +59,6 @@
         .messages_col {
             width: 300px;
             height: 500px;
-
-            .list {
-                height: 410px;
-                display: flex;
-                flex-direction: column;
-                overflow: auto;
-
-                .system_message {
-                    padding: 5px;
-                    box-sizing: border-box;
-                    text-align: center;
-                    color: #808080;
-                }
-
-                .this_system_message {
-                    text-align: left;
-                    padding: 5px;
-                    box-sizing: border-box;
-
-                    label {
-                        color: #808080;
-                        font-size: 12px;
-                    }
-                }
-
-                .other_system_message {
-                    text-align: right;
-                    padding: 5px;
-                    box-sizing: border-box;
-
-                    label {
-                        color: #808080;
-                        font-size: 12px;
-                    }
-                }
-            }
-
-            .footer {
-                height: 60px;
-                display: flex;
-                flex-direction: row;
-                align-items: center;
-                padding: 5px;
-                box-sizing: border-box;
-
-                input {
-                    height: 60%;
-                }
-            }
         }
 
         .draw_col {

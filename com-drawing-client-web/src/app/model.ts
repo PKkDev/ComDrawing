@@ -22,5 +22,4 @@ export interface CursorModel {
 export interface MessageModel {
     message: string,
     userName: string
-    template: TemplateRef<any>
 }

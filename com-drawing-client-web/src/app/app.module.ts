@@ -6,6 +6,7 @@ import { HttpClientModule } from '@angular/common/http';
 import { RouterTestingModule } from "@angular/router/testing";
 // components
 import { AppComponent } from './app.component';
+import { ChatViewComponent } from './components/chat-view/chat-view.component';
 // mat
 import { MatButtonModule } from '@angular/material/button';
 import { MatInputModule } from '@angular/material/input';
@@ -15,7 +16,8 @@ import { MatSelectModule } from '@angular/material/select';
 
 @NgModule({
   declarations: [
-    AppComponent
+    AppComponent,
+    ChatViewComponent
   ],
   imports: [
     FormsModule,
