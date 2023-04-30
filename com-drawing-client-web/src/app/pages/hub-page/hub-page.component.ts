@@ -30,7 +30,6 @@ export class HubPageComponent implements OnInit, AfterViewInit {
   public ctx: CanvasRenderingContext2D | null = null;
 
   constructor(
-    private http: HttpClient,
     private route: Router,
     private configService: ConfigService,
     private elementRef: ElementRef,
