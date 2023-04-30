@@ -4,134 +4,134 @@
     display: flex;
     justify-content: center;
 
-    .settings_card {
-        background: #fff;
-        display: flex;
-        justify-content: center;
-        width: 450px;
-        height: fit-content;
-        margin: 5px;
-        box-shadow: 0 2px 1px -1px #0003, 0 1px 1px #00000024, 0 1px 3px #0000001f;
-        border-radius: 5px;
-        padding: 15px;
-        align-items: center;
-        flex-direction: column;
+    // .settings_card {
+    //     background: #fff;
+    //     display: flex;
+    //     justify-content: center;
+    //     width: 450px;
+    //     height: fit-content;
+    //     margin: 5px;
+    //     box-shadow: 0 2px 1px -1px #0003, 0 1px 1px #00000024, 0 1px 3px #0000001f;
+    //     border-radius: 5px;
+    //     padding: 15px;
+    //     align-items: center;
+    //     flex-direction: column;
 
-        .row {
-            width: 100%;
-            margin-bottom: 15px;
+    //     .row {
+    //         width: 100%;
+    //         margin-bottom: 15px;
 
-            button {
-                margin: 0 5px;
-            }
+    //         button {
+    //             margin: 0 5px;
+    //         }
 
-            .my_form_field {
-                width: 50%;
-            }
-        }
+    //         .my_form_field {
+    //             width: 50%;
+    //         }
+    //     }
 
-        .my_form_field {
-            width: 100%;
-        }
-    }
+    //     .my_form_field {
+    //         width: 100%;
+    //     }
+    // }
 
-    .draw_card {
-        display: flex;
-        justify-content: center;
-        width: 1200px;
-        height: fit-content;
+    // .draw_card {
+    //     display: flex;
+    //     justify-content: center;
+    //     width: 1200px;
+    //     height: fit-content;
 
-        .col {
-            background: #fff;
-            box-shadow: 0 2px 1px -1px #0003, 0 1px 1px #00000024, 0 1px 3px #0000001f;
-            border-radius: 5px;
-            margin: 5px;
-            box-sizing: border-box;
-            height: fit-content;
+    //     .col {
+    //         background: #fff;
+    //         box-shadow: 0 2px 1px -1px #0003, 0 1px 1px #00000024, 0 1px 3px #0000001f;
+    //         border-radius: 5px;
+    //         margin: 5px;
+    //         box-sizing: border-box;
+    //         height: fit-content;
 
-            .title {
-                height: 25px;
-                width: 100%;
-                text-align: center;
-            }
-        }
+    //         .title {
+    //             height: 25px;
+    //             width: 100%;
+    //             text-align: center;
+    //         }
+    //     }
 
-        .messages_col {
-            width: 300px;
-            height: 500px;
-        }
+    //     .messages_col {
+    //         width: 300px;
+    //         height: 500px;
+    //     }
 
-        .draw_col {
-            width: 650px;
-            padding: 5px;
-            box-sizing: border-box;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+    //     .draw_col {
+    //         width: 650px;
+    //         padding: 5px;
+    //         box-sizing: border-box;
+    //         display: flex;
+    //         justify-content: center;
+    //         align-items: center;
 
-            canvas {
-                border: thin dashed #000;
-                z-index: 2;
-                background-color: #fff;
-                position: relative;
-            }
-        }
+    //         canvas {
+    //             border: thin dashed #000;
+    //             z-index: 2;
+    //             background-color: #fff;
+    //             position: relative;
+    //         }
+    //     }
 
-        .tool_col {
-            width: 250px;
-            padding: 10px;
-            box-sizing: border-box;
-            display: flex;
-            flex-direction: column;
+    //     .tool_col {
+    //         width: 250px;
+    //         padding: 10px;
+    //         box-sizing: border-box;
+    //         display: flex;
+    //         flex-direction: column;
 
-            .connect_state {
-                text-align: center;
-            }
+    //         .connect_state {
+    //             text-align: center;
+    //         }
 
-            .color_line {
-                display: flex;
-                align-items: center;
+    //         .color_line {
+    //             display: flex;
+    //             align-items: center;
 
-                .color_picker {
-                    height: 28px;
-                    padding: 0;
-                    outline: none;
-                    border: none;
-                }
-                .eraser_icon {
-                    cursor: pointer;
-                    margin: 0 5px;
-                    width: 28px;
-                    height: 28px;
-                }
-            }
+    //             .color_picker {
+    //                 height: 28px;
+    //                 padding: 0;
+    //                 outline: none;
+    //                 border: none;
+    //             }
+    //             .eraser_icon {
+    //                 cursor: pointer;
+    //                 margin: 0 5px;
+    //                 width: 28px;
+    //                 height: 28px;
+    //             }
+    //         }
 
-            .tool_labels_row {
-                display: flex;
-                justify-content: space-between;
-                margin-top: 10px;
-                .width_tool_label {
-                }
-                .width_tool_value {
-                }
-            }
-            .width_tool_slider {
-            }
-        }
-    }
+    //         .tool_labels_row {
+    //             display: flex;
+    //             justify-content: space-between;
+    //             margin-top: 10px;
+    //             .width_tool_label {
+    //             }
+    //             .width_tool_value {
+    //             }
+    //         }
+    //         .width_tool_slider {
+    //         }
+    //     }
+    // }
 }
 
-.display_cursor {
-    padding: 3px 5px;
-    box-sizing: border-box;
-    border-radius: 6px;
-    font-size: 13px;
-    position: absolute;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background: #19a7ce;
-    top: 0;
-    left: 0;
-    z-index: 3;
-}
+// .display_cursor {
+//     padding: 3px 5px;
+//     box-sizing: border-box;
+//     border-radius: 6px;
+//     font-size: 13px;
+//     position: absolute;
+//     display: flex;
+//     justify-content: center;
+//     align-items: center;
+//     background: #19a7ce;
+//     top: 0;
+//     left: 0;
+//     z-index: 3;
+// }

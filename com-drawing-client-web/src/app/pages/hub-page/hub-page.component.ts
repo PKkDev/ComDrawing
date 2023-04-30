@@ -1,66 +1,68 @@
-import { AfterViewInit, Component, ElementRef, OnInit, QueryList, Renderer2, ViewChildren } from '@angular/core';
-import { HubConnection, HubConnectionBuilder, HubConnectionState } from '@microsoft/signalr';
-import { CursorData, CursorModel, DrawData, MessageModel } from './model';
 import { HttpClient, HttpParams, HttpRequest } from '@angular/common/http';
+import { AfterViewInit, Component, ElementRef, OnInit, Renderer2, ViewChild } from '@angular/core';
+import { Router } from '@angular/router';
+import { HubConnection, HubConnectionBuilder, HubConnectionState } from '@microsoft/signalr';
+import { ConfigService } from 'src/app/config.service';
+import { ConfigModel, CursorData, CursorModel, DrawData, MessageModel } from 'src/app/model';
 import { Clipboard } from '@angular/cdk/clipboard';
 
 @Component({
-  selector: 'app-root',
-  templateUrl: './app.component.html',
-  styleUrls: ['./app.component.scss']
+  selector: 'app-hub-page',
+  templateUrl: './hub-page.component.html',
+  styleUrls: ['./hub-page.component.scss']
 })
-export class AppComponent implements OnInit, AfterViewInit {
-
-  public host: string | undefined;
-  public userName: string | undefined;
-  public groupName: string | undefined;
-
-  private map: Map<string, CursorModel> = new Map<string, CursorModel>();
+export class HubPageComponent implements OnInit, AfterViewInit {
 
   public connection: HubConnection | undefined;
   public isConnected: boolean = false;
 
-  @ViewChildren('canvas') private canvases?: QueryList<ElementRef>;
-  public canvas: ElementRef | undefined;
-  public ctx: CanvasRenderingContext2D | null = null;
+  public config!: ConfigModel;
 
   public messages: MessageModel[] = [];
 
   public color: string = '#000';
   public width: number = 1;
 
+  private map: Map<string, CursorModel> = new Map<string, CursorModel>();
+
+  @ViewChild('canvas', { static: false }) canvas: ElementRef<any> | undefined;
+
+  public ctx: CanvasRenderingContext2D | null = null;
+
   constructor(
     private http: HttpClient,
+    private route: Router,
+    private configService: ConfigService,
     private elementRef: ElementRef,
     private renderer2: Renderer2,
-    private clipboard: Clipboard) {
+    private clipboard: Clipboard) { }
+
+  ngOnInit() {
+    const config = this.configService.getConfig();
+    if (config) {
+      this.config = config;
+      this.initiclConnect();
+    }
+    else {
+      this.route.navigate(['/connect']);
+    }
   }
 
-  //#region Settings
-
-  public isConfigured = false;
-  public isSelectedHost = true;
-  public isSelectedClient = false;
-
-  public totalGroups: string[] = [];
-
-  public onRefreshGroups() {
-    this.http.get<string[]>(this.host + 'api/groups/all')
-      .subscribe({
-        next: (value: string[]) => {
-          this.totalGroups = value;
-        },
-      });
+  ngAfterViewInit() {
+    if (this.canvas) {
+      const canvasItem = this.canvas.nativeElement as HTMLCanvasElement;
+      this.ctx = canvasItem.getContext('2d');
+    }
   }
 
-  public onConnect() {
+  private initiclConnect() {
     if (this.connection && this.connection.state != HubConnectionState.Disconnected) {
       this.connection.stop();
       this.connection = undefined;
     }
 
     this.connection = new HubConnectionBuilder()
-      .withUrl(this.host + 'DrawHub')
+      .withUrl(this.config.host + 'DrawHub')
       .build();
 
     this.connection.onclose((err) => {
@@ -70,12 +72,12 @@ export class AppComponent implements OnInit, AfterViewInit {
     this.isConnected = true;
 
     this.connection.on('DrawReceived', (userName: string, data: DrawData,) => {
-      if (this.userName != userName)
+      if (this.config.userName != userName)
         this.drawLine(data.startX, data.startY, data.endX, data.endY, data.width, data.colorHex);
     });
 
     this.connection.on('MoveCursorReceived', (userName: string, data: CursorData) => {
-      if (this.userName != userName)
+      if (this.config.userName != userName)
         this.viewCursor(data.x, data.y, userName);
     });
 
@@ -89,56 +91,8 @@ export class AppComponent implements OnInit, AfterViewInit {
         this.isConnected = false;
       })
       .then(() => {
-        this.connection?.invoke('AddToGroup', this.groupName, this.userName)
+        this.connection?.invoke('AddToGroup', this.config.groupName, this.config.userName)
       });
-
-    this.isConfigured = true;
-  }
-
-  //#endregion Settings
-
-  ngOnInit() {
-    // this.host = window.document.baseURI;
-    // this.checkUrlParam();
-  }
-
-  private checkUrlParam() {
-    const searchParams = new URLSearchParams(window.document.URL);
-
-    const group = searchParams.get("group");
-    if (group) {
-      this.totalGroups.push(group)
-      this.groupName = group;
-    }
-
-    const host = searchParams.get("host");
-    if (host) {
-      const encodedHost = decodeURIComponent(host);
-      this.host = encodedHost;
-    }
-
-    if (group && host) {
-      this.isSelectedHost = false;
-      this.isSelectedClient = true;
-    }
-  }
-
-  ngAfterViewInit() {
-    // if (this.canvases) {
-    //   this.canvases.changes.subscribe((x: QueryList<ElementRef>) => {
-    //     if (x.length) {
-    //       for (const iterator of x) {
-    //         const canvasItem = iterator.nativeElement as HTMLCanvasElement;
-    //         this.ctx = canvasItem.getContext('2d');
-    //         this.canvas = iterator;
-    //       }
-    //     }
-    //   });
-    // }
-  }
-
-  public onSelectEraser() {
-    this.color = '#fff';
   }
 
   //#region  Drawing
@@ -170,7 +124,7 @@ export class AppComponent implements OnInit, AfterViewInit {
           width: this.width, colorHex: this.color
         }
         this.connection
-          .invoke("Drawing", this.groupName, this.userName, drawData)
+          .invoke("Drawing", this.config.groupName, this.config.userName, drawData)
           .catch((err) => { this.viewSystemMessage(err); });
       }
 
@@ -181,7 +135,7 @@ export class AppComponent implements OnInit, AfterViewInit {
     if (this.connection && this.connection.state == HubConnectionState.Connected) {
       const cursorData: CursorData = { x: currX, y: currY, }
       this.connection
-        .invoke("MoveCursor", this.groupName, this.userName, cursorData)
+        .invoke("MoveCursor", this.config.groupName, this.config.userName, cursorData)
         .catch((err) => { this.viewSystemMessage(err); });
     }
 
@@ -189,15 +143,6 @@ export class AppComponent implements OnInit, AfterViewInit {
 
   public onMouseUp(event: any) {
     this.isDrawing = false;
-  }
-
-  //#endregion Drawing
-
-  public onSendMessage(message: string) {
-    if (this.connection)
-      this.connection
-        .invoke('SendMessageToGroup', this.groupName, this.userName, message)
-        .catch((err) => { this.viewSystemMessage(err); });
   }
 
   private viewCursor(x: number, y: number, userName: string) {
@@ -245,6 +190,19 @@ export class AppComponent implements OnInit, AfterViewInit {
     }
   }
 
+  //#endregion Drawing
+
+  public onSendMessage(message: string) {
+    if (this.connection)
+      this.connection
+        .invoke('SendMessageToGroup', this.config.groupName, this.config.userName, message)
+        .catch((err) => { this.viewSystemMessage(err); });
+  }
+
+  public onSelectEraser() {
+    this.color = '#fff';
+  }
+
   //#region View message
   private viewSystemMessage(message: string) {
     this.messages.push({
@@ -261,14 +219,12 @@ export class AppComponent implements OnInit, AfterViewInit {
   //#endregion View message
 
   public onCopyLinc() {
-    if (this.host && this.groupName) {
-      const httpParams: HttpParams = new HttpParams()
-        .append('id', '5')
-        .append('host', encodeURIComponent(this.host))
-        .append('group', this.groupName);
-      const req = new HttpRequest('GET', window.document.baseURI, { params: httpParams });
-      this.clipboard.copy(req.urlWithParams)
-    }
+    const httpParams: HttpParams = new HttpParams()
+      .append('id', '5')
+      .append('host', encodeURIComponent(this.config.host))
+      .append('group', this.config.groupName);
+    const req = new HttpRequest('GET', window.document.baseURI + 'connect', { params: httpParams });
+    this.clipboard.copy(req.urlWithParams)
   }
 
 }

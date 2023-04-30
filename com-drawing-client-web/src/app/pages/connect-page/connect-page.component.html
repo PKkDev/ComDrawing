@@ -1,0 +1,55 @@
+<div class=" settings_card">
+
+  <div class="row">
+    <button mat-raised-button [color]="isSelectedHost? 'primary':''"
+      (click)="isSelectedHost = true; isSelectedClient = false;">Хост</button>
+
+    <button mat-raised-button [color]="isSelectedClient? 'primary':''"
+      (click)="isSelectedHost = false; isSelectedClient = true;">Клиент</button>
+  </div>
+
+
+  <mat-form-field class="my_form_field" appearance="outline">
+    <mat-label>Хост</mat-label>
+    <input matInput type="text" [(ngModel)]="host" required autocomplete="off">
+    <button *ngIf="host" matSuffix mat-icon-button aria-label="Clear" (click)="host=''">
+      <mat-icon>close</mat-icon>
+    </button>
+  </mat-form-field>
+
+  <mat-form-field class="my_form_field" appearance="outline">
+    <mat-label>Имя пользователя</mat-label>
+    <input matInput type="text" [(ngModel)]="userName" required autocomplete="off">
+    <button *ngIf="userName" matSuffix mat-icon-button aria-label="Clear" (click)="userName=''">
+      <mat-icon>close</mat-icon>
+    </button>
+  </mat-form-field>
+
+  <mat-form-field class="my_form_field" appearance="outline" *ngIf="isSelectedHost">
+    <mat-label>Группа</mat-label>
+    <input matInput type="text" [(ngModel)]="groupName" required autocomplete="off">
+    <button *ngIf="groupName" matSuffix mat-icon-button aria-label="Clear" (click)="groupName=''">
+      <mat-icon>close</mat-icon>
+    </button>
+  </mat-form-field>
+
+  <div class="row" *ngIf="isSelectedClient">
+
+    <mat-form-field class="my_form_field" appearance="outline">
+      <mat-label>Группа</mat-label>
+      <mat-select [(ngModel)]="groupName">
+        <mat-option *ngFor="let group of totalGroups" [value]="group">
+          {{group}}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <button mat-raised-button (click)="onRefreshGroups()">Обновить</button>
+
+  </div>
+
+
+  <button mat-raised-button color="primary" [disabled]=" !userName || !host || !groupName"
+    (click)="onConnect()">Подключиться</button>
+
+</div>

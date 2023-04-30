@@ -1,6 +1,8 @@
 <div class="page_container">
 
-  <div class=" settings_card" *ngIf="!isConfigured">
+  <router-outlet></router-outlet>
+
+  <!-- <div class=" settings_card" *ngIf="!isConfigured">
 
     <div class="row">
       <button mat-raised-button [color]="isSelectedHost? 'primary':''"
@@ -54,9 +56,9 @@
     <button mat-raised-button color="primary" [disabled]=" !userName || !host || !groupName"
       (click)="onConnect()">Подключиться</button>
 
-  </div>
+  </div> -->
 
-  <div class="draw_card" *ngIf="isConfigured">
+  <!-- <div class="draw_card" *ngIf="isConfigured">
 
     <div class="messages_col col">
       <app-chat-view (sendMessage)="onSendMessage($event)" [messages]="messages" [userName]="userName"></app-chat-view>
@@ -113,7 +115,7 @@
 
     </div>
 
-  </div>
+  </div> -->
 
 </div>
 

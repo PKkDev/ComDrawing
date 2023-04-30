@@ -23,3 +23,15 @@ export interface MessageModel {
     message: string,
     userName: string
 }
+
+export class ConfigModel {
+    public host: string;
+    public userName: string;
+    public groupName: string;
+
+    constructor(host: string, userName: string, groupName: string) {
+        this.host = host;
+        this.userName = userName;
+        this.groupName = groupName;
+    }
+}
